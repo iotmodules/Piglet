@@ -1,0 +1,29 @@
+##############################################################
+
+## Arduino Pro or Pro Mini (3V3 & 5V, 8 MHz) w/ ATmega328 MYSBootloader
+## -------------------------------------------------
+
+piglet.name=Piglet ATmega328 8Mhz Internal (DualOptiboot_V5.0)
+
+piglet.upload.protocol=arduino
+piglet.upload.maximum_size=30720
+piglet.upload.maximum_data_size=2048
+piglet.upload.speed=57600
+
+piglet.bootloader.low_fuses=0xFF
+piglet.bootloader.high_fuses=0xD8
+piglet.bootloader.extended_fuses=0xFF
+
+piglet.build.board=ATMega328P
+
+piglet.bootloader.file=atmega/DualOptiboot_V5.0_atmega328_BlinkD9.hex
+piglet.bootloader.unlock_bits=0x3F
+piglet.bootloader.lock_bits=0x0F
+
+piglet.build.mcu=atmega328p
+piglet.build.f_cpu=8000000L
+piglet.build.core=arduino:arduino
+piglet.build.variant=arduino:standard
+
+piglet.bootloader.tool=arduino:avrdude
+piglet.upload.tool=arduino:avrdude
