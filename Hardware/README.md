@@ -5,10 +5,10 @@ Features of the Piglet IOT development board
  
  * ATMega328-au fully compatible with the Arduino IDE
  * Support for Optiboot and DualOptiboot Bootloaders
- * Extremeley low power consumption when asleep typically 8uA
- * External 8Mhz crystal oscillator to allow support for the critical timig required by the LORA radios and the LMIC LoRaWAN Library https://github.com/matthijskooijman/arduino-lmic
+ * Extremely low power consumption when asleep typically 8uA
+ * External 8Mhz crystal oscillator to allow support for the critical timing required by the LORA radios and the LMIC LoRaWAN Library https://github.com/matthijskooijman/arduino-lmic
  * Precision resistor divider to accurately measure the battery voltage before the regulator
- * Real time clock with temperature compensation to provide hi level of accuaracy for time critical functions such as scheduling of transmissions and timestamping events. 
+ * Real time clock with temperature compensation to provide a high level of accuaracy for time critical functions such as scheduling of transmissions and timestamping events. 
  * Support for HopeRF HCW69HCW and RFM95 Lora radios 
  * On board EUI-64 unique ID accesible over the I2C bus
  * On board 4Mbit SPI flash for configuration data storage and code updates using DualOptiboot 
