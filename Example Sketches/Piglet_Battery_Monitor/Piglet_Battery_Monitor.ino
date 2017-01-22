@@ -42,6 +42,7 @@
 
 void setup() {
   Serial.begin(38400);
+  analogReference(EXTERNAL);    //uses the external 2.7v voltage reference from the texas regulator ths is very accurate
 }
 
 void loop() {
@@ -54,7 +55,7 @@ void loop() {
 }
 
 float getBatteryVoltage(){
-  //convert adc value to voltage using internal reference and bridge ratio
+  //convert adc value to voltage using external reference and bridge ratio
   int aValue = analogRead(A6);
   float ref = ((2.7/1023.0000)*(aValue));
   float correction = 4.24/4.24;
