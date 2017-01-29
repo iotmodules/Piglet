@@ -66,6 +66,7 @@
 #define MY_PARENT_NODE_IS_STATIC
 #define MY_TRANSPORT_UPLINK_CHECK_DISABLED
 #define MY_TRANSPORT_WAIT_READY_MS 1000
+#define MY_SLEEP_TRANSPORT_RECONNECT_TIMEOUT_MS 0
 
 #define MY_OTA_FIRMWARE_FEATURE        // Enables OTA (over the air) capability
 #define MY_OTA_FLASH_SS 8               // Flash CS (chip select) pin used
