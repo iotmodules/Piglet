@@ -79,8 +79,8 @@
 #define PIGLET_I2C_PULLUP_PIN 7
 
 #define INTERRUPT_PIN 3 // interrupt for RTC
-#define RTC_CLOCK_PIN 7 //power for the RTC
-#define WAKEINTERVAL 5  //interval between wake up times this sets the interval of the RTC alarm
+//#define RTC_CLOCK_PIN 7 //power for the RTC
+#define WAKEINTERVAL 10  //interval between wake up times this sets the interval of the RTC alarm
 
 #define LED_PIN 9 //onboard LED
 
@@ -124,15 +124,8 @@ void setup(void)
   pinMode(SCL, INPUT);          //setting these as inputs reduces the power used by 70uA
   pinMode(SDA, INPUT);          //setting these as inputs reduces the power used by 70uA
   pinMode(LED_PIN, OUTPUT);
-
-  // make sure the flash is sleeping to save power. Investigate if needed though
-  if (!_flash.initialize()){
-    sendSketchInfo(SKETCH_NAME, SKETCH_MAJOR_VER "." SKETCH_MINOR_VER); 
-  }
-  else{
-    _flash.sleep();
-  }
-  
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, LOW); //sleep the rt clock to save power
+  if (_flash.initialize()) _flash.sleep();  // make sure the flash is sleeping to save power. Investigate if needed though
   analogReference(EXTERNAL);    //uses the external 2.7v voltage reference from the texas regulator ths is very accurate
   initAlarm(); //initialise the alarm
 
@@ -143,7 +136,6 @@ void presentation(){
     sendSketchInfo(getEUI64(), SKETCH_MAJOR_VER "." SKETCH_MINOR_VER);
     // Register all sensors to gw (they will be created as child devices)
     present(SENSOR_DATA_ID, S_CUSTOM, SENSOR_DATA_DESCRIPTION, false);// Register all sensors to gw (they will be created as single child device)
-    
     requestTime();  //get the server time to update the onboard RTC
     wait(400);  // needed to wait for time to be returned
 }
@@ -206,6 +198,7 @@ void normalFlow(void) {
     //wait(100); // now done with fwUpdateOngoing lne instead
     fwUpdateOngoing = wait(OTA_WAIT_PERIOD, C_STREAM, ST_FIRMWARE_RESPONSE); // also acts as delay to wait for other internal messages to arrive such as reboot and present before sleeping
     
+   delay(100);
     digitalWrite(LED_PIN, LOW);
     sleep(digitalPinToInterrupt(INTERRUPT_PIN),FALLING,0); 
     //smartSleep(digitalPinToInterrupt(INTERRUPT_PIN),FALLING,0);
@@ -216,11 +209,6 @@ void normalFlow(void) {
     wait(10000);
   }
 }
-
-
-
-
-
 //====================================================================================================================================================//
 
 
@@ -279,25 +267,25 @@ bool rtcTrigger = true; //setup trigger initially to get the alarm going
 
 t_hms setAlarm(long inSecondsTime){
   rtcTrigger = false; //reset the interrupt trigger
-  digitalWrite(RTC_CLOCK_PIN, HIGH); //power up the clock
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, HIGH); //power up the clock
   RTC.alarm(ALARM_1); // reset the alarm
   time_t t = RTC.get();  // get the time
   long totalSeconds = (long(hour(t)) * 60 * 60)+ (long(minute(t)) * 60) + long(second(t)) + inSecondsTime;  //calculate second to wake up on
   t_hms ts = convertHMS(totalSeconds); // calculate wakeup time in hours minutes and seconds
   RTC.setAlarm(ALM1_MATCH_HOURS , ts.tSeconds, ts.tMinutes, ts.tHours, 0); //set the alarm
-  digitalWrite(RTC_CLOCK_PIN, LOW); //sleep the rt clock to save power
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, LOW); //sleep the rt clock to save power
   return ts;  
 }
 
 void initAlarm(){
   
-  pinMode(RTC_CLOCK_PIN, OUTPUT);
-  digitalWrite(RTC_CLOCK_PIN, HIGH);          // powers up rtc clock
+  pinMode(PIGLET_I2C_PULLUP_PIN, OUTPUT);
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, HIGH);          // powers up rtc clock
   RTC.squareWave(SQWAVE_NONE);                // no square wave
   RTC.alarmInterrupt(ALARM_2, false);         // disables alarm 2
   RTC.alarmInterrupt(ALARM_1, true);          // This alarm has resolution in seconds
   RTC.setAlarm(ALM1_MATCH_HOURS, 0, 0, 0, 0); // match alarm when hours mins and seconds match so longest sleep duration is 24 hours
-  digitalWrite(RTC_CLOCK_PIN, LOW);           // puts the RTC into sleep mode and saves power
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, LOW);           // puts the RTC into sleep mode and saves power
   
 }
 
@@ -317,26 +305,26 @@ t_hms convertHMS(long tSec){
 char* getTime(){
 
   char timeBuff[30];
-  digitalWrite(RTC_CLOCK_PIN, HIGH);  //turn on real time clock dont forget to turn on before using
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, HIGH);  //turn on real time clock dont forget to turn on before using
   time_t t = RTC.get(); //get the time
   timeFormat(t).toCharArray(timeBuff, 30);  //format into a readable time and date
-  digitalWrite(RTC_CLOCK_PIN, LOW); // puts the RTC into sleep mode and saves power
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, LOW); // puts the RTC into sleep mode and saves power
   return timeBuff;
   
 }
 
 void writeTime(long timeInSeconds){
-  digitalWrite(RTC_CLOCK_PIN, HIGH);  
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, HIGH);  
   RTC.set(timeInSeconds);
-  digitalWrite(RTC_CLOCK_PIN, LOW);  
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, LOW);  
 }
 
 float getTemp(){
 
-  digitalWrite(RTC_CLOCK_PIN, HIGH); 
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, HIGH); 
   int tp = RTC.temperature(); //get the temp
   float celsius = tp / 4.0; //do conversion to degrees centigrade
-  digitalWrite(RTC_CLOCK_PIN, HIGH); 
+  digitalWrite(PIGLET_I2C_PULLUP_PIN, LOW); 
   return celsius;
   
 }
