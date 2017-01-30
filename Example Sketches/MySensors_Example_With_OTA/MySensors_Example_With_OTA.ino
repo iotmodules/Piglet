@@ -137,7 +137,10 @@ void presentation(){
     // Register all sensors to gw (they will be created as child devices)
     present(SENSOR_DATA_ID, S_CUSTOM, SENSOR_DATA_DESCRIPTION, false);// Register all sensors to gw (they will be created as single child device)
     requestTime();  //get the server time to update the onboard RTC
-    wait(400);  // needed to wait for time to be returned
+    flashLedWait(4,400);  // needed to wait for time to be returned now flashes led to identify device too
+    //wait(400);  // needed to wait for time to be returned
+    digitalWrite(PIGLET_I2C_PULLUP_PIN, LOW); //ensures I2C is turned off so pullups dont draw power
+   
 }
 
 void receiveTime(unsigned long time) {  // This is called when a new time value was received
@@ -176,7 +179,7 @@ void loop() {
 
 void normalFlow(void) {
 
-  digitalWrite(LED_PIN, HIGH);
+  //digitalWrite(LED_PIN, HIGH);
   if (lastTime != lastRecievedTime){  //update time if required
     writeTime(lastRecievedTime);
     lastTime = lastRecievedTime;
@@ -195,17 +198,15 @@ void normalFlow(void) {
   //sendHeartbeat();
   if (doSleep){
     
-    //wait(100); // now done with fwUpdateOngoing lne instead
     fwUpdateOngoing = wait(OTA_WAIT_PERIOD, C_STREAM, ST_FIRMWARE_RESPONSE); // also acts as delay to wait for other internal messages to arrive such as reboot and present before sleeping
-    
-   delay(100);
-    digitalWrite(LED_PIN, LOW);
+    flashLedWait(1,100);
+    //digitalWrite(LED_PIN, LOW);
     sleep(digitalPinToInterrupt(INTERRUPT_PIN),FALLING,0); 
     //smartSleep(digitalPinToInterrupt(INTERRUPT_PIN),FALLING,0);
   
   }
   else {
-    digitalWrite(LED_PIN, LOW);
+    //digitalWrite(LED_PIN, LOW);
     wait(10000);
   }
 }
@@ -342,5 +343,28 @@ String printDigits(int digits) {
   x = x + String(digits);
   return x;
 }
+
+
+void flashLedWait(int iTimes,long lDelay){
+
+
+   long flashTime = (lDelay/iTimes)/3;
+   for (int i = 0; i < iTimes; i++) {
+
+      pinMode(LED_PIN, OUTPUT);
+      digitalWrite(LED_PIN, HIGH);
+      wait(flashTime);
+      digitalWrite(LED_PIN, LOW);
+      wait(flashTime*2);
+    
+   }
+  
+  
+}
+
+
+
+
+
 
                              
